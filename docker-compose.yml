@@ -1,27 +1,28 @@
+version: '3.9'
+
 services:
+
   eurekaserver:
     build: ./eurekaserver
     container_name: eurekaserver
-    ports:
-      - "8761:8761"
     healthcheck:
       test: "curl --fail --silent localhost:8761/actuator/health | grep UP || exit 1"
       interval: 10s
+    networks:
+      - springcloud
 
   configserve:
     build: ./configserve
     container_name: configserve
-    ports:
-      - "9999:9999"
     healthcheck:
       test: "curl --fail --silent localhost:9999/actuator/health | grep UP || exit 1"
       interval: 10s
+    networks:
+      - springcloud
 
   domaine-ms:
     build: ./domaine-microservice
     container_name: domaine-ms
-    ports:
-      - "8085:8083"
     environment:
       - DISCOVERY_SERVICE_URL=http://eurekaserver:8761/eureka/
       - CONFIG_SERVICE_URL=http://configserve:9999
@@ -33,24 +34,12 @@ services:
         condition: service_healthy
       configserve:
         condition: service_healthy
+    networks:
+      - springcloud
 
-  gatewayserver:
-    build: ./gatewayserver
-    container_name: gatewayserver
-    ports:
-      - "8888:8888"
-    environment:
-      - DISCOVERY_SERVICE_URL=http://eurekaserver:8761/eureka/
-    depends_on:
-      eurekaserver:
-        condition: service_healthy
-
-
-  domaine-ms2:
+  domain-ms2:
     build: ./domaine-microservice
     container_name: domaine-ms2
-    ports:
-      - "8084:8083"
     environment:
       - DISCOVERY_SERVICE_URL=http://eurekaserver:8761/eureka/
       - CONFIG_SERVICE_URL=http://configserve:9999
@@ -61,12 +50,12 @@ services:
         condition: service_healthy
       configserve:
         condition: service_healthy
+    networks:
+      - springcloud
 
   universite-ms:
     build: ./universite-microservice
     container_name: universite-ms
-    ports:
-      - "8081:8081"
     environment:
       - DISCOVERY_SERVICE_URL=http://eurekaserver:8761/eureka/
       - CONFIG_SERVICE_URL=http://configserve:9999
@@ -77,3 +66,25 @@ services:
         condition: service_healthy
       domaine-ms:
         condition: service_healthy
+    networks:
+      - springcloud
+
+  gatewayserver:
+    build: ./gatewayserver
+    container_name: gatewayserver
+    ports:
+      - "8888:8888"
+    environment:
+      - DISCOVERY_SERVICE_URL=http://eurekaserver:8761/eureka/
+      - CONFIG_SERVICE_URL=http://configserve:9999
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+      configserve:
+        condition: service_healthy
+    networks:
+      - springcloud
+
+networks:
+  springcloud:
+    driver: bridge

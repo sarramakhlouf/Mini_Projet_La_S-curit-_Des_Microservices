@@ -8,6 +8,10 @@ spring :
       enabled: false
     discovery:
       enabled: true
+#    openfeign:
+#      circuitbreaker:
+#        enabled: true
+
     gateway:
 #      routes:
 #        - id: r1
@@ -22,11 +26,7 @@ spring :
         locator:
           enabled: false
           lower-case-service-id: true
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: "http://localhost:8080/realms/master/protocol/openid-connect/certs"
+
 eureka:
   client:
     register-with-eureka: true
