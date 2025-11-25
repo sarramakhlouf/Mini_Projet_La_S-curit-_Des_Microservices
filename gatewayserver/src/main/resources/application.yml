@@ -8,6 +8,13 @@ spring :
       enabled: false
     discovery:
       enabled: true
+
+  security:
+    oauth2:
+      resourceserver:
+      jwt:
+        jwk-set-uri: "http://localhost:8000/realms/master/protocol/openid-connect/certs"
+        issuer-uri: "http://localhost:8000/realms/master"
 #    openfeign:
 #      circuitbreaker:
 #        enabled: true
